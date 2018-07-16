@@ -4,3 +4,6 @@
 [submodule "externals/libzmq"]
 	path = externals/libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "externals/cppzmq"]
+	path = externals/cppzmq
+	url = https://github.com/zeromq/cppzmq.git
