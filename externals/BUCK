@@ -1,4 +1,25 @@
 
+
+# genrule(
+#   name = 'win-platform.hpp',
+#   srcs = ['win-platform.hpp.in'],
+#   cmd = '(type $SRCS) > $OUT',
+#   out = 'platform.hpp',
+# )
+
+
+prebuilt_cxx_library(
+  name = 'Catch2',
+  header_only = True,
+  header_dirs = [
+    'Catch2/include'
+  ],
+  visibility = [
+    'PUBLIC',
+  ],
+)
+
+
 cxx_library(
     name = 'SQLite3',
     header_namespace = '',
@@ -14,6 +35,21 @@ cxx_library(
         '-DSQLITE_OMIT_LOAD_EXTENSION',
     ],
 )
+
+
+prebuilt_cxx_library(
+  name = 'cppzmq',
+  header_only = True,
+  header_namespace = '',
+  exported_headers  = subdir_glob([ # public include files
+    ('cppzmq', '**/*.h'), # those will be exported
+    ('cppzmq', '**/*.hpp'), # those will be exported,
+  ]),
+  visibility = [
+    'PUBLIC',
+  ]
+)
+
 
 cxx_library(
     name = 'SQLiteCpp',
@@ -33,4 +69,39 @@ cxx_library(
     visibility = [
         'PUBLIC',
     ],
+)
+
+
+cxx_library(
+  name = 'libzmq',
+  header_namespace = '',
+  exported_headers = subdir_glob([
+    ('libzmq/include', '*.h'),
+  ]),
+  headers = subdir_glob([
+    ('libzmq/src', '*.hpp'),
+  ]),
+  srcs = glob([
+    'libzmq/src/*.cpp',
+    'libzmq/src/*.c',   # windows only?
+  ]),
+  platform_preprocessor_flags = [
+    ('.x86_64$', {'/DWIN32', '/D_WIN32', '/D_WINDOWS'}),
+  ],
+  exported_preprocessor_flags = [
+    '-DZMQ_STATIC',
+    '-DZMQ_CUSTOM_PLATFORM_HPP',
+    '-DFD_SETSIZE=16384',
+    '-D_CRT_SECURE_NO_WARNINGS',
+    '-D_WINSOCK_DEPRECATED_NO_WARNINGS',
+  ],
+  exported_platform_linker_flags = [
+    ('.x86_64$', {'ws2_32.lib','rpcrt4.lib', 'iphlpapi.lib'}),
+  ],
+  platform_compiler_flags = [
+    ('.x86_64$', {'/EHsc'}),
+  ],
+  visibility = [
+    'PUBLIC',
+  ],
 )

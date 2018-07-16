@@ -43,7 +43,7 @@ cxx_binary(
   ]),
   deps = [
     '//:allocate',
-    '//externals/Catch2:Catch2'
+    '//externals:Catch2'
   ],
   compiler_flags = [
     '-std=c++17',
