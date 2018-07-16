@@ -7,3 +7,6 @@
 [submodule "externals/cppzmq"]
 	path = externals/cppzmq
 	url = https://github.com/zeromq/cppzmq.git
+[submodule "externals/framework"]
+	path = externals/framework
+	url = https://github.com/jared-two-foxes/framework.git
