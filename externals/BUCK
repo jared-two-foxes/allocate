@@ -1,0 +1,36 @@
+
+cxx_library(
+    name = 'SQLite3',
+    header_namespace = '',
+    exported_headers = subdir_glob([
+        ('SQLiteCpp/sqlite3','*.h'),
+    ]),
+    srcs = glob([
+        'SQLiteCpp/sqlite3/*.c',
+    ]),
+    compiler_flags=[
+        '-DSQLITE_ENABLE_COLUMN_METADATA',
+        '-DSQLITE_THREADSAFE=0',
+        '-DSQLITE_OMIT_LOAD_EXTENSION',
+    ],
+)
+
+cxx_library(
+    name = 'SQLiteCpp',
+    header_namespace = 'SQLiteCpp',
+    exported_headers = subdir_glob([
+        ('SQLiteCpp/include/SQLiteCpp','**/*.h'),
+    ]),
+    srcs = glob([
+        'SQLiteCpp/src/*.cpp',
+    ]),
+    deps = [
+        ':SQLite3'
+    ],
+    compiler_flags=[
+        '-DSQLITE_OMIT_LOAD_EXTENSION',
+    ],
+    visibility = [
+        'PUBLIC',
+    ],
+)
