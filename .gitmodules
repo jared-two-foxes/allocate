@@ -1,3 +1,6 @@
 [submodule "externals/SQLiteCpp"]
 	path = externals/SQLiteCpp
 	url = https://github.com/SRombauts/SQLiteCpp.git
+[submodule "externals/libzmq"]
+	path = externals/libzmq
+	url = https://github.com/zeromq/libzmq.git
