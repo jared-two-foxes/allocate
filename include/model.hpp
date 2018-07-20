@@ -3,23 +3,28 @@
 
 #include <string>
 #include <vector>
-typedef uuid int; //< make uuid just an int for now.
+//typedef int uuid; //< make uuid just an int for now.
 
-struct accounts {
+namespace data
+{
+
+struct Account {
     std::string Name;          // Varchar(255)
     std::string AccountNumber; // Varchar(18)
 };
 
-struct transaction {
+struct Transaction {
     std::string Name;
     float Amount;
-    int Frequency;
-    Date StartDate;
+    std::string Frequency;
+    std::string StartDate;
 };
 
-struct model {
-    std::vector<accounts > Accounts;
-    std::vector<transaction > Transactions;
+struct Model {
+    std::vector<Account > Accounts;
+    std::vector<Transaction > Transactions;
 };
+
+}
 
 #endif // __MODEL_HPP__

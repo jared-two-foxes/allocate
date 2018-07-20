@@ -1,13 +1,12 @@
 
-#include <framework/terminal/components/stacklayout.hpp>
+#include <framework/terminal/components/component.hpp>
 #include <framework/terminal/terminal.hpp>
 
-#include <allocate/dispatcher.hpp>
+//#include <allocate/dispatcher.hpp>
+#include <allocate/model.hpp>
+#include <allocate/widgets.hpp>
 
 #include <vector>
-
-
-constexpr const char* DATABASE_FILENAME = "data.sqlite3";
 
 
 std::vector<std::string> split(std::string str, std::string token){
@@ -32,56 +31,23 @@ std::vector<std::string> split(std::string str, std::string token){
 
 int main(int argc, char* argv[])
 {
-    bool quit = false;
-    std::string command;
-    const std::string prompt = ">>";
+    data::Model model {
+        {
+            {"Spending", "00-0000-0000000-000"},
+            {"Saving", "00-0000-0000000-000"}
+        },
+        {
+            {"Wages", 3251.22, "Fortnightly", "06/07/2018" },
+            {"Mortgage", -4350.98, "Monthly", "18/07/2018" },
+            {"Car", -260.89, "Monthly", "23/07/2018" },
+            {"Car Insurance", -98.71, "Monthly", "07/07/2018" },
+            {"Internet", -99.99, "Monthly", "23/07/2018" }
+        }
+    };
+
+    // Show the current state.
     framework::VirtualTerminal vt;
+    vt = vt.flip( ui::render(model).render(80).toString() );
 
-
-    auto quit_fn = [&quit](const std::vector<std::string >& args) {
-        quit = true;
-    };
-
-    auto help = [](const std::vector<std::string >& args) {
-        std::cout << "print a bunch of help strings.";
-    };
-
-    auto buildView = [=]() -> framework::Component {
-        return framework::StackLayout<>(
-            framework::Text{"Allocate!"},
-            framework::Text{"Enter command to execute or 'help' for a list of available commands. "}, //< segfaults on an empty string (""), needs to have a space in it.
-            framework::Text{prompt}
-        );
-    };
-
-
-    CommandDispatcher<std::string, void (const std::vector<std::string >& ) >
-        dispatcher {{
-            {"quit", quit_fn},
-            {"help", help}
-        }};
-
-
-    std::string line;
-    std::vector<std::string > args;
-
-    do
-    {
-        // Show the current state.
-        vt = vt.flip(buildView().render(80).toString());
-        std::cout << framework::clearLines(0);
-
-        // Grab the next operation from the command line.
-        getline( std::cin, line );
-
-        // Pre-process command, splitting out all the args
-        args = split( line, " " );
-
-        // Pass to the parse to do with it what it will.
-        dispatcher.process( args[0], args );
-    } while (!quit);
-
-
-    std::cout << framework::clearLines(0);
     return 0;
 }
