@@ -1,15 +1,17 @@
 #ifndef __STORE_HPP__
 #define __STORE_HPP__
 
+template <typename T >
 class Store {
 private:
-    //FN Reducer; //??
+    T store;
     std::vector<listener > Listeners;
 
 public:
-    template <typename T, typename FN>
-    T dispatch(T data, FN reducer) {
-        return data;
+    template <typename FN, typename Action>
+    Action dispatch(FN reducer, Action action) {
+        store = reducer(store, action);
+
     }
 };
 

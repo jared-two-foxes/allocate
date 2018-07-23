@@ -15,7 +15,7 @@ namespace ui
 {
 
 template <typename T >
-framework::Component render( const T& account );
+framework::Component render( const T& value );
 
 template <typename T >
 framework::Component render_stack( const std::vector<T >& items )
@@ -37,11 +37,23 @@ framework::Component render_flow( const std::vector<T >& items )
     return flow;
 }
 
+template <typename Component>
+framework::Component renderHelper(Component c, std::string delim) {
+    return framework::FlowLayout<> {
+        render(c), render(delim)
+    };
+}
+
 template <typename... Components >
 framework::Component flow(std::string delim, Components... c) {
     return framework::FlowLayout<> {
-        (render(c), render(delim))...,
+        renderHelper(c, delim)...,
     };
+}
+
+template <>
+framework::Component render( const float& obj ) {
+    return framework::Text { std::to_string(obj) };
 }
 
 template <>
@@ -49,11 +61,16 @@ framework::Component render( const std::string& str ) {
     return framework::Text {str};
 }
 
+// template <typename T>
+// framework::Component render( const T& obj ) {
+//     return framework::Text { std::to_string(obj) };
+// }
+
 template <>
 framework::Component render( const data::Account& account )
 {
     return flow(
-        std::string(", "),
+        std::string(", \t"),
         account.Name,
         account.AccountNumber
     );
@@ -63,20 +80,20 @@ template <>
 framework::Component render( const data::Transaction& transaction )
 {
     return flow(
-        std::string(", "),
-        transaction.Name,
+        std::string(", \t"),
         transaction.Amount,
+        transaction.Name,
         transaction.Frequency,
         transaction.StartDate
     );
 }
-
 
 framework::Component render( const data::Model& model )
 {
     return framework::StackLayout<> {
         framework::Text {"Accounts"},
         render_stack( model.Accounts ),
+        framework::Text {" "},
         framework::Text {"Transactions"},
         render_stack( model.Transactions ),
         framework::Text {" "},
@@ -85,18 +102,6 @@ framework::Component render( const data::Model& model )
         framework::Text {">>"}
     };
 }
-
-
-// template <typename T>
-// framework::Component render( const T& obj ) {
-//     return framework::Text { std::to_string(obj) };
-// }
-
-template <>
-framework::Component render( const float obj ) {
-    return framework::Text { std::to_string(obj) };
-}
-
 
 }
 
