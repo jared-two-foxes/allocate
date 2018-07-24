@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
     // Show the current state.
     framework::VirtualTerminal vt;
-    vt = vt.flip( ui::render(model).render(80).toString() );
+    vt = vt.flip( ui::render(model).render(100).toString() );
 
     return 0;
 }
