@@ -1,6 +1,7 @@
 #ifndef RENDER_HPP__
 #define RENDER_HPP___
 
+#include <allocate/functional.hpp>
 #include <allocate/string_helper.hpp>
 
 #include <framework/terminal/components/component.hpp>
@@ -48,8 +49,6 @@ framework::Component render( const T& o, int w, const std::string& delim ) {
     return render( cast( o ) + delim, w );
 }
 
-
-
 template <typename T, typename U>
 framework::Component render( std::pair<T, U> const& pair ) {
     return render( pair.first, pair.second );
@@ -62,30 +61,17 @@ framework::Component render( std::pair<T, U> const& pair, const std::string& del
 
 
 
-template <typename T >
-framework::Component render_stack( const std::vector<T >& items )
-{
-    framework::StackLayout<> stack {};
-    for ( const auto& elem : items ) {
-        stack.children.push_back( render( elem ) );
-    }
-    return stack;
+template <typename Function, typename... Components >
+framework::Component stack( Function fn, Components... c ) {
+    return framework::StackLayout<> {
+        fn( c )...,
+    };
 }
 
-template <typename T >
-framework::Component render_flow( const std::vector<T >& items )
-{
-    framework::FlowLayout<> flow {};
-    for ( const auto& elem : items ) {
-        flow.children.push_back( render( elem ) );
-    }
-    return flow;
-}
-
-template <typename... Components >
-framework::Component flow(std::string delim, Components... c) {
+template <typename Function, typename... Components >
+framework::Component flow( Function fn, Components... c ) {
     return framework::FlowLayout<> {
-        render(c, delim)...,
+        fn( c )...,
     };
 }
 

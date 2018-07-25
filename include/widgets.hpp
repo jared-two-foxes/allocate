@@ -1,27 +1,33 @@
 #ifndef WIDGETS_HPP__
 #define WIDGETS_HPP__
 
+#include <allocate/functional.hpp>
 #include <allocate/model.hpp>
 #include <allocate/render.hpp>
+
+
 
 namespace ui
 {
 
-template <>
-framework::Component render( const data::Account& account )
+framework::Component show( data::Account const & account );
+framework::Component show( data::Transaction const & transaction );
+framework::Component show( data::Model const & model );
+
+
+inline framework::Component show( data::Account const & account )
 {
     return flow(
-        std::string(","),
+        []( auto const & o ){ return render( o ); },
         std::make_pair( account.Name, 24 ),
         account.AccountNumber
     );
 }
 
-template <>
-framework::Component render( const data::Transaction& transaction )
+inline framework::Component show( data::Transaction const & transaction )
 {
     return flow(
-        std::string(","),
+        []( auto& o ){ return render( o ); },
         std::make_pair( transaction.Name, 24 ),
         std::make_pair( transaction.Amount, 10 ),
         std::make_pair( transaction.Frequency, 14 ),
@@ -29,18 +35,20 @@ framework::Component render( const data::Transaction& transaction )
     );
 }
 
-framework::Component render( const data::Model& model )
+inline framework::Component show( data::Model const & model )
 {
     return framework::StackLayout<> {
-        framework::Text {"Accounts"},
-        render_stack( model.Accounts ),
-        framework::Text {" "},
-        framework::Text {"Transactions"},
-        render_stack( model.Transactions ),
-        framework::Text {" "},
-        framework::Text {" "},
-        framework::Text {"Please enter a command:"},
-        framework::Text {">>"}
+        render( std::string("Accounts") ),
+        framework::StackLayout<>::Create(
+            map( [](auto const & o){ return show( o ); }, model.Accounts ) ),
+        render( std::string(" ") ),
+        render( std::string("Transactions") ),
+        framework::StackLayout<>::Create(
+            map( [](auto const & o){ return show( o ); }, model.Transactions ) ),
+        render( std::string(" ") ),
+        render( std::string(" ") ),
+        render( std::string("Please enter a command:") ),
+        render( std::string(">>") )
     };
 }
 
