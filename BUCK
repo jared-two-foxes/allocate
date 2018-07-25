@@ -8,12 +8,15 @@ cxx_library(
   srcs = glob([
     'source/*.cpp'
   ]),
-  exported_deps = [
-    '//externals:SQLiteCpp'
+  platform_compiler_flags = [
+    ('.x86_64$', {'/EHsc'}),
   ],
   compiler_flags = [
-    '-std=c++17',
+    '/EHsc'
   ],
+  deps = [
+    '//externals/framework:framework',
+  ]
 )
 
 cxx_binary(
@@ -25,10 +28,9 @@ cxx_binary(
     '-lpthread',
   ],
   compiler_flags = [
-    '-std=c++17',
+    '/EHsc'
   ],
   deps = [
-    '//externals/framework:framework',
     '//:allocate_lib',
   ],
 )
@@ -46,6 +48,5 @@ cxx_binary(
     '//externals:Catch2'
   ],
   compiler_flags = [
-    '-std=c++17',
   ],
 )

@@ -20,11 +20,11 @@ int main(int argc, char* argv[])
             {"Saving", "00-0000-0000000-000"}
         },
         {
-            {"Wages", 3251.22, "Fortnightly", "06/07/2018" },
-            {"Mortgage", -4350.98, "Monthly", "18/07/2018" },
-            {"Car", -260.89, "Monthly", "23/07/2018" },
-            {"Car Insurance", -98.71, "Monthly", "07/07/2018" },
-            {"Internet", -99.99, "Monthly", "23/07/2018" }
+            {"Wages", 3251.22f, "Fortnightly", "06/07/2018" },
+            {"Mortgage", -4350.98f, "Monthly", "18/07/2018" },
+            {"Car", -260.89f, "Monthly", "23/07/2018" },
+            {"Car Insurance", -98.71f, "Monthly", "07/07/2018" },
+            {"Internet", -99.99f, "Monthly", "23/07/2018" }
         }
     };
 
