@@ -39,11 +39,11 @@ inline framework::Component show( data::Model const & model )
 {
     return framework::StackLayout<> {
         render( std::string("Accounts") ),
-        framework::StackLayout<>::Create(
+        framework::StackLayout<> (
             map( [](auto const & o){ return show( o ); }, model.Accounts ) ),
         render( std::string(" ") ),
         render( std::string("Transactions") ),
-        framework::StackLayout<>::Create(
+        framework::StackLayout<> (
             map( [](auto const & o){ return show( o ); }, model.Transactions ) ),
         render( std::string(" ") ),
         render( std::string(" ") ),
