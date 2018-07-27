@@ -16,7 +16,7 @@ namespace ui
 
 template <typename T >
 framework::Component render( const T& o )  {
-    return framework::Text { cast( o ) };
+    return framework::Text { foundation::toString( o ) };
 }
 
 template <typename T >
@@ -36,17 +36,17 @@ framework::Component render( const std::string& s, int w ) {
 
 template <>
 framework::Component render( const float& o, int w ) {
-    return render( cast( o ), w );
+    return render( foundation::toString( o ), w );
 }
 
 template <typename T >
 framework::Component render( const T& o, const std::string& delim ) {
-    return render( cast( o ) + delim );
+    return render( foundation::toString( o ) + delim );
 }
 
 template <typename T >
 framework::Component render( const T& o, int w, const std::string& delim ) {
-    return render( cast( o ) + delim, w );
+    return render( foundation::toString( o ) + delim, w );
 }
 
 template <typename T, typename U>
