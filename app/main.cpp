@@ -1,6 +1,6 @@
 
-#include <framework/terminal/components/component.hpp>
-#include <framework/terminal/terminal.hpp>
+#include <terminal/components/component.hpp>
+#include <terminal/terminal.hpp>
 
 #include <allocate/dispatcher.hpp>
 #include <allocate/model.hpp>
@@ -36,7 +36,7 @@ std::vector<std::string > split( std::string str, std::string token )
 }
 
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
     std::string line;
     std::vector<std::string > args;

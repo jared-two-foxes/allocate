@@ -6,7 +6,6 @@
 #include <allocate/render.hpp>
 
 
-
 namespace ui
 {
 

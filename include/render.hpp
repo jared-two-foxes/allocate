@@ -4,9 +4,9 @@
 #include <allocate/functional.hpp>
 #include <allocate/string_helper.hpp>
 
-#include <framework/terminal/components/component.hpp>
-#include <framework/terminal/components/flowlayout.hpp>
-#include <framework/terminal/components/stacklayout.hpp>
+#include <terminal/components/component.hpp>
+#include <terminal/components/flowlayout.hpp>
+#include <terminal/components/stacklayout.hpp>
 
 #include <vector>
 #include <utility>
