@@ -44,10 +44,6 @@ inline framework::Component show( data::Model const & model )
         render( std::string("Transactions") ),
         framework::StackLayout<> (
             map( [](auto const & o){ return show( o ); }, model.Transactions ) ),
-        render( std::string(" ") ),
-        render( std::string(" ") ),
-        render( std::string("Please enter a command:") ),
-        render( std::string(">>") )
     };
 }
 
