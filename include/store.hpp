@@ -7,15 +7,14 @@
 namespace data
 {
 
+template <typename State, typename Action >
+State reduce( State state, Action action );
+
 struct Listener
 {
   virtual void onStateChanged() = 0;
 };
 
-// struct Action
-// {
-//   int type;
-// };
 
 constexpr const int INIT = 0;
 
@@ -57,13 +56,11 @@ public:
   Action dispatch( Action action )
   {
     isDispatching = true;
-    //currentState = currentReducer( currentState, action );
+    currentState = reduce( currentState, action );
     isDispatching = false;
 
-    Log( 0, "Iterate listeners.\n" );
     for ( auto& listener : listeners )
     {
-      Log( 0, "Calling listener.\n" );
       listener->onStateChanged();
     }
 

@@ -15,12 +15,23 @@
 
 
 
-namespace reducers
+namespace data
 {
-  data::Model reduce( actions::AddAccount action, data::Model other )
+  data::Model reduce( data::Model other, actions::AddAccount action )
   {
+    Log( 0, "AddAccount reducer\n" );
+
     data::Model model = other;
     model.Accounts.push_back( { action.Name, action.AccountNumber } );
+    return model;
+  }
+
+  data::Model reduce( data::Model other, actions::RefreshAccounts action )
+  {
+    Log( 0, "RefreshAccounts reducer\n" );
+
+    data::Model model = other;
+    model.Accounts = action.accounts;
     return model;
   }
 }
@@ -48,6 +59,8 @@ void Application::setup()
 
 void Application::renderSingleFrame( data::Model const& model )
 {
+  Log( 0, "renderSingleFrame\n" );
+
   std::string next = ui::show(model).render(100).toString();
 
   next += '\n' + output + '\n';
@@ -64,12 +77,12 @@ void Application::processCmd( std::string& cmd, std::vector<std::string >& args 
 
 void Application::run()
 {
-    Log( 0, "Starting main loop." );
+    Log( 0, "Starting main loop.\n" );
 
     std::string line;
     std::vector<std::string > args;
 
-    do
+    while (!quit)
     {
         //renderSingleFrame();
         output = ""; //< clear out the output from the last iteration so its not repeated.
@@ -86,7 +99,7 @@ void Application::run()
 
         args = foundation::split( line, " " );      // Parse; Pre-process command, splitting out all the args
         processCmd( args[0], args );
-    } while (!quit);
+    }
 }
 
 void Application::initDatabase()
@@ -95,7 +108,7 @@ void Application::initDatabase()
   {
     // Open a database file in create/write mode
     database = new SQLite::Database( "test.db3", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE );
-    std::cout << "SQLite database file '" << database->getFilename().c_str() << "' opened successfully\n";
+    //std::cout << "SQLite database file '" << database->getFilename().c_str() << "' opened successfully\n";
 
     // Create a new table with an explicit "id" column aliasing the underlying rowid
     database->exec( "CREATE TABLE IF NOT EXISTS Accounts (id INTEGER PRIMARY KEY, Name VARCHAR(255), AccountNumber VARCHAR(18))" );
@@ -106,9 +119,7 @@ void Application::initDatabase()
       //return EXIT_FAILURE; // unexpected error : exit the example program
   }
 
-  Log( 0, "Refreshing accounts.\n" );
   store->dispatch( actions::refreshAccounts( database ) );
-  Log( 0, "Accounts refreshed.\n" );
 }
 
 void Application::initDispatcher()
@@ -179,7 +190,7 @@ void Application::initModel()
 
     virtual void onStateChanged()
     {
-      Log( 0, "Listener callback.\n" );
+      Log( 0, "onStateChanged callback.\n" );
       data::Model state = store->getState();
       app->renderSingleFrame(state);
     }
