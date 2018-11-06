@@ -5,7 +5,7 @@
 #include <allocate/widgets.hpp>
 #include <terminal/components/component.hpp>
 #include <foundation/logger.hpp>
-#include <foundation/string_helper.hpp>
+#include <foundation/strings/utils.hpp>
 
 #include <assert.h>
 #include <exception>

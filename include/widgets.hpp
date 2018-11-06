@@ -1,10 +1,12 @@
 #ifndef WIDGETS_HPP__
 #define WIDGETS_HPP__
 
-#include <allocate/functional.hpp>
 #include <allocate/model.hpp>
 #include <allocate/render.hpp>
 
+#include <foundation/base/functional.hpp>
+
+using foundation::map;
 
 namespace ui
 {

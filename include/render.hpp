@@ -1,12 +1,12 @@
 #ifndef RENDER_HPP__
 #define RENDER_HPP___
 
-#include <allocate/functional.hpp>
-#include <allocate/string_helper.hpp>
-
 #include <terminal/components/component.hpp>
 #include <terminal/components/flowlayout.hpp>
 #include <terminal/components/stacklayout.hpp>
+
+#include <foundation/base/functional.hpp>
+#include <foundation/strings/utils.hpp>
 
 #include <vector>
 #include <utility>
