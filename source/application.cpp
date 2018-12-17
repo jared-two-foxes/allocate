@@ -61,13 +61,19 @@ void Application::renderSingleFrame( data::Model const& model )
 {
   Log( 0, "renderSingleFrame\n" );
 
-  std::string next = ui::show(model).render(100).toString();
+  framework::StackLayout<> layout {
+    ui::show(model),
+    output.size() > 0 ? framework::Text(""), framework::Text(),
+    framework::Text(output),
+    framework::Text(" "),
+    framework::Text("Please enter a command:"),
+    framework::Text(">>")
+  };
 
-  next += '\n' + output + '\n';
-  next += "\n\nPlease enter a command:\n>>";  //< Add in the temporary cli prompt.
+  //@todo: reset cursor back to the end of the last element in the list?
 
   // Show the current state.
-  terminal = terminal.flip( next );
+  terminal = terminal.flip( layout.render(100).toString() );
 }
 
 void Application::processCmd( std::string& cmd, std::vector<std::string >& args )
@@ -77,29 +83,24 @@ void Application::processCmd( std::string& cmd, std::vector<std::string >& args 
 
 void Application::run()
 {
-    Log( 0, "Starting main loop.\n" );
+  Log( 0, "Starting main loop.\n" );
 
-    std::string line;
-    std::vector<std::string > args;
+  std::string line;
+  std::vector<std::string > args;
 
-    while (!quit)
-    {
-        //renderSingleFrame();
-        output = ""; //< clear out the output from the last iteration so its not repeated.
+  while (!quit)
+  {
+    output = "";                            //< clear out the output from the last iteration so its not repeated.
+    getline( std::cin, line );              //< Grab the next operation from the command line.
 
-        getline( std::cin, line );                  // Grab the next operation from the command line.
-        //std::cin.ignore();
+    output += "Received Command: ";
+    output += line;
+    output += "\n";
+    Log( 0, output );
 
-        output += "Received Command: ";
-        output += line;
-        output += "\n";
-        Log( 0, output );
-
-        //terminal = terminal.append( line + '\n' );  // Add it to the current terminal state.
-
-        args = foundation::split( line, " " );      // Parse; Pre-process command, splitting out all the args
-        processCmd( args[0], args );
-    }
+    args = foundation::split( line, " " );  //< Pre-process command, split commands and arguments
+    processCmd( args[0], args );
+  }
 }
 
 void Application::initDatabase()
@@ -108,15 +109,15 @@ void Application::initDatabase()
   {
     // Open a database file in create/write mode
     database = new SQLite::Database( "test.db3", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE );
-    //std::cout << "SQLite database file '" << database->getFilename().c_str() << "' opened successfully\n";
+    Log( 0, std::string("SQLite database file '") + << database->getFilename() + "' opened successfully\n" );
 
     // Create a new table with an explicit "id" column aliasing the underlying rowid
     database->exec( "CREATE TABLE IF NOT EXISTS Accounts (id INTEGER PRIMARY KEY, Name VARCHAR(255), AccountNumber VARCHAR(18))" );
   }
   catch ( std::exception& e )
   {
-      Log( 0, std::string("SQLite exception: ") + e.what() + "\n" );
-      //return EXIT_FAILURE; // unexpected error : exit the example program
+    Log( 0, std::string("SQLite exception: ") + e.what() + "\n" );
+    // unexpected error: exit the program?  Not sure how we should recover
   }
 
   store->dispatch( actions::refreshAccounts( database ) );

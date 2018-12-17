@@ -10,10 +10,7 @@
 int main( int argc, char* argv[] )
 {
   // Setup Loggers.
-  BasicLogger consoleLogger( std::cout );
-  RegisterLogger( &consoleLogger, 100 );
   std::ofstream file( "log.txt" );
-  // TODO: should we clear the log file before each run?
   BasicLogger fileLogger( file );
   RegisterLogger( &fileLogger, 0 );
 
@@ -26,8 +23,7 @@ int main( int argc, char* argv[] )
 
   // Exiting
   std::cout << "exiting...\n";
-  //std::cout << framework::clearLines(0);
-  std::cout << "done!";
+  std::cout << "done!\n";
 
   return 0;
 }
