@@ -15,10 +15,10 @@ struct Account {
 };
 
 struct Transaction {
-    std::string Name;
-    float Amount;
-    std::string Frequency;
-    std::string StartDate;
+    std::string Name;         // VARCHAR(255)
+    float Amount;             // DECIMAL (8,2)
+    std::string Frequency;    // VARCHAR(32)
+    std::string StartDate;    // TIMESTAMP
 };
 
 struct Model {

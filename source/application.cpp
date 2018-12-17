@@ -63,7 +63,7 @@ void Application::renderSingleFrame( data::Model const& model )
 
   framework::StackLayout<> layout {
     ui::show(model),
-    output.size() > 0 ? framework::Text(""), framework::Text(),
+    output.size() > 0 ? framework::Text("\n") : framework::Text(""),
     framework::Text(output),
     framework::Text(" "),
     framework::Text("Please enter a command:"),
@@ -109,10 +109,12 @@ void Application::initDatabase()
   {
     // Open a database file in create/write mode
     database = new SQLite::Database( "test.db3", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE );
-    Log( 0, std::string("SQLite database file '") + << database->getFilename() + "' opened successfully\n" );
+    Log( 0, std::string("SQLite database file '") + database->getFilename() + "' opened successfully\n" );
 
     // Create a new table with an explicit "id" column aliasing the underlying rowid
     database->exec( "CREATE TABLE IF NOT EXISTS Accounts (id INTEGER PRIMARY KEY, Name VARCHAR(255), AccountNumber VARCHAR(18))" );
+
+    database->exec( "CREATE TABLE IF NOT EXISTS Transactions (id INTEGER PRIMARY KEY, Name VARCHAR(255), Amount DECIMAL(8,2), Frequency VARCHAR32), StartDate TIMESTAMP )" );
   }
   catch ( std::exception& e )
   {
