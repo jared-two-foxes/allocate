@@ -3,26 +3,42 @@
 
 #include <allocate/model.hpp>
 #include <foundation/logger.hpp>
-#include <SQLiteCpp/Database.h>
-#include <SQLiteCpp/VariadicBind.h>
 #include <string>
 #include <vector>
 
 
 namespace actions {
 
-struct RefreshAccounts
-{
+//
+// Lifecycle actions.
+//
+
+struct Init {
   std::vector<data::Account > accounts;
+  std::vector<data::Transaction > transactions;
 };
 
-RefreshAccounts refreshAccounts( SQLite::Database* database );
+Init initState();
+Init initState( data::Account* accounts, std::size_t accountCount );
 
 
-using AddAccount = data::Account;
-//struct AddAccount : public data::Account {};
+//
+// Account actions
+//
 
-AddAccount addAccount( SQLite::Database* database, std::string const& name, std::string const& number );
+struct AddAccount {
+  std::string Name;
+  std::string AccountNumber;
+};
+
+struct UpdatedAccount {
+  std::string Name;
+  std::string AccountNumber;
+};
+
+AddAccount addAccount( std::string const& name, std::string const& number );
+
+UpdatedAccount updateAccount( std::string const& name, std::string const& number );
 
 }
 

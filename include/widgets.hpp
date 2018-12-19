@@ -19,7 +19,6 @@ framework::Component show( data::Model const & model );
 inline framework::Component show( data::Account const & account )
 {
     return flow(
-        []( auto const & o ){ return render( o ); },
         std::make_pair( account.Name, 24 ),
         account.AccountNumber
     );
@@ -28,7 +27,6 @@ inline framework::Component show( data::Account const & account )
 inline framework::Component show( data::Transaction const & transaction )
 {
     return flow(
-        []( auto& o ){ return render( o ); },
         std::make_pair( transaction.Name, 24 ),
         std::make_pair( transaction.Amount, 10 ),
         std::make_pair( transaction.Frequency, 14 ),

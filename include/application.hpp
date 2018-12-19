@@ -16,13 +16,10 @@ private:
   using CallbackSignature = void (const std::vector<std::string >& );
 
 private:
-  SQLite::Database* database;
   framework::terminal terminal;
   CommandDispatcher<std::string, CallbackSignature > dispatcher;
-  data::Store<data::Model >* store;
+  data::Store<data::Model > store;
   bool quit;
-
-  std::string output;
 
   public:
     Application();
@@ -35,10 +32,8 @@ private:
     void run();
 
   private:
-    void initDatabase();
+    void initStoreListener();
     void initDispatcher();
-    void initModel();
-    void initTerminal();
 
 };
 

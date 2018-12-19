@@ -1,8 +1,9 @@
 
 #include <allocate/application.hpp>
-
 #include <allocate/actions.hpp>
+#include <allocate/reducers.hpp>
 #include <allocate/widgets.hpp>
+
 #include <terminal/components/component.hpp>
 #include <foundation/logger.hpp>
 #include <foundation/strings/utils.hpp>
@@ -11,50 +12,20 @@
 #include <exception>
 
 
-#define SAFE_DELETE(p) if ((p) != NULL) { delete (p); (p) = NULL; }
-
-
-
-namespace data
-{
-  data::Model reduce( data::Model other, actions::AddAccount action )
-  {
-    Log( 0, "AddAccount reducer\n" );
-
-    data::Model model = other;
-    model.Accounts.push_back( { action.Name, action.AccountNumber } );
-    return model;
-  }
-
-  data::Model reduce( data::Model other, actions::RefreshAccounts action )
-  {
-    Log( 0, "RefreshAccounts reducer\n" );
-
-    data::Model model = other;
-    model.Accounts = action.accounts;
-    return model;
-  }
-}
-
-
 Application::Application() :
-  database(nullptr),
-  store(nullptr),
+  store({}),
   quit(false)
 {}
 
 Application::~Application()
-{
-  SAFE_DELETE(database);
-  SAFE_DELETE(store);
-}
+{}
 
 void Application::setup()
 {
-  initModel();
-  initDatabase();
+  initStoreListener();
   initDispatcher();
-  initTerminal();
+
+  store.dispatch( actions::initState() );
 }
 
 void Application::renderSingleFrame( data::Model const& model )
@@ -63,17 +34,15 @@ void Application::renderSingleFrame( data::Model const& model )
 
   framework::StackLayout<> layout {
     ui::show(model),
-    output.size() > 0 ? framework::Text("\n") : framework::Text(""),
-    framework::Text(output),
     framework::Text(" "),
-    framework::Text("Please enter a command:"),
-    framework::Text(">>")
+    framework::Text("Please enter a command:")
   };
 
-  //@todo: reset cursor back to the end of the last element in the list?
+  std::string const next = layout.render(100).toString();
+  std::string const prompt( ">> " );
 
   // Show the current state.
-  terminal = terminal.flip( layout.render(100).toString() );
+  terminal = terminal.flip( next + prompt );
 }
 
 void Application::processCmd( std::string& cmd, std::vector<std::string >& args )
@@ -90,124 +59,59 @@ void Application::run()
 
   while (!quit)
   {
-    output = "";                            //< clear out the output from the last iteration so its not repeated.
-    getline( std::cin, line );              //< Grab the next operation from the command line.
+    // Grab the next operation from the command line.
+    getline( std::cin, line );
 
-    output += "Received Command: ";
-    output += line;
-    output += "\n";
-    Log( 0, output );
+    terminal = terminal.append( line + '\n' );
 
-    args = foundation::split( line, " " );  //< Pre-process command, split commands and arguments
+    // Pre-process command, split commands and arguments, and send to the
+    // command processor.
+    args = foundation::split( line, " " );
     processCmd( args[0], args );
   }
 }
 
-void Application::initDatabase()
-{
-  try
-  {
-    // Open a database file in create/write mode
-    database = new SQLite::Database( "test.db3", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE );
-    Log( 0, std::string("SQLite database file '") + database->getFilename() + "' opened successfully\n" );
-
-    // Create a new table with an explicit "id" column aliasing the underlying rowid
-    database->exec( "CREATE TABLE IF NOT EXISTS Accounts (id INTEGER PRIMARY KEY, Name VARCHAR(255), AccountNumber VARCHAR(18))" );
-
-    database->exec( "CREATE TABLE IF NOT EXISTS Transactions (id INTEGER PRIMARY KEY, Name VARCHAR(255), Amount DECIMAL(8,2), Frequency VARCHAR32), StartDate TIMESTAMP )" );
-  }
-  catch ( std::exception& e )
-  {
-    Log( 0, std::string("SQLite exception: ") + e.what() + "\n" );
-    // unexpected error: exit the program?  Not sure how we should recover
-  }
-
-  store->dispatch( actions::refreshAccounts( database ) );
-}
-
 void Application::initDispatcher()
 {
-  auto quit_fn = [this](const std::vector<std::string >& args)
-  {
+  // Lifecycle functions.
+  auto quit_fn = [this](const std::vector<std::string >& args) {
       Log( 0, "Quiting..." );
       quit = true;
   };
 
-  // Database Functions...
-
-  auto insert_fn = [this](const std::vector<std::string >& args)
-  {
+  // Account Functions.
+  auto insert_account_fn = [this](const std::vector<std::string >& args ) {
     assert( args.size() >= 3 );
-    store->dispatch( actions::addAccount( database, args[1], args[2] ) );
+    store.dispatch( actions::addAccount( args[1], args[2] ) );
   };
 
-  auto update_fn = [this](const std::vector<std::string >& args)
-  {
-      try
-      {
-        database->exec("UPDATE Accounts SET value=\"second-updated\" WHERE id='2'");
-      }
-      catch ( std::exception& e )
-      {
-        Log( 0, "failed to update to database entry.\n" );  // something bad!
-      }
+  auto update_account_fn = [this](const std::vector<std::string >& args ) {
+    assert( args.size() >= 3 );
+    store.dispatch( actions::updateAccount( args[1], args[2] ) );
   };
 
-  auto query_fn = [this](const std::vector<std::string >& args)
-  {
-    try
-    {
-      SQLite::Statement query( *database, "SELECT * FROM Accounts" );
-      output += "SELECT * FROM Accounts :\n";
-
-      while ( query.executeStep() )
-      {
-        const std::string id = query.getColumn(0);
-        const std::string name = query.getColumn(1);
-        const std::string accountNumber = query.getColumn(2);
-        output += std::string("row (") + id + ", " + name + ", " + accountNumber + ")\n";
-      }
-    }
-    catch ( std::exception& e )
-    {
-      Log( 0, "query failed.\n" );  // something bad!
-    }
-  };
-
-  dispatcher = CommandDispatcher<std::string, void (const std::vector<std::string >& ) > {{
-      {"quit", quit_fn},
-      {"insert", insert_fn},
-      {"update", update_fn},
-      {"query", query_fn}
-  }};
+  // Create the actual dispatcher
+  dispatcher =
+      CommandDispatcher<std::string,
+          void (std::vector<std::string > const& ) > {{
+              {"quit", quit_fn},
+              {"addAccount", insert_account_fn},
+              {"updateAccount", update_account_fn}
+          }};
 }
 
-void Application::initModel()
+void Application::initStoreListener()
 {
-  Log( 0, "Init model.\n" );
-
   struct Listener : public data::Listener
   {
-    data::Store<data::Model >* store;
     Application* app;
-
-    virtual void onStateChanged()
-    {
-      Log( 0, "onStateChanged callback.\n" );
-      data::Model state = store->getState();
+    virtual void onStateChanged() {
+      data::Model state = app->store.getState();
       app->renderSingleFrame(state);
     }
   };
 
-  store = new data::Store<data::Model >( {} );
-
-  Log( 0, "Adding main application listener.\n" );
   static Listener listener;
-  listener.store = store;
   listener.app = this;
-  store->addListener( &listener );
-  Log( 0, "Listener added.\n" );
+  store.addListener( &listener );
 }
-
-void Application::initTerminal()
-{}

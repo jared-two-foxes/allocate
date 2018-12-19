@@ -2,7 +2,6 @@
 #define __STORE_HPP__
 
 #include <foundation/logger.hpp>
-
 #include <functional>
 #include <vector>
 
@@ -18,8 +17,6 @@ struct Listener
 };
 
 
-constexpr const int INIT = 0;
-
 template <typename State >
 class Store
 ///
@@ -27,22 +24,14 @@ class Store
 /// interaction.
 ///
 {
-  //using ReducerFunction = State ( State, Action );
-
 private:
-  bool isDispatching;
   State currentState;
-  //std::function<ReducerFunction > currentReducer;
   std::vector<Listener* > listeners;
 
 public:
-  Store( /*ReducerFunction reducer,*/ State initialState/*, enhancer*/ ) :
-    isDispatching(false),
-    //currentReducer(reducer),
+  Store( State initialState ) :
     currentState(initialState)
-  {
-    //dispatch( { INIT } );
-  }
+  { }
 
   State getState()
   {
@@ -54,19 +43,15 @@ public:
     listeners.push_back( listener );
   }
 
-  template <typename Action >
-  Action dispatch( Action action )
+  template <typename... Args >
+  void dispatch( Args... args )
   {
-    isDispatching = true;
-    currentState = reduce( currentState, action );
-    isDispatching = false;
-
+    currentState = reduce( currentState, args... );
     for ( auto& listener : listeners )
     {
       listener->onStateChanged();
     }
-
-    return action;
+    //return action;
   }
 };
 

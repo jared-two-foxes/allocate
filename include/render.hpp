@@ -61,17 +61,17 @@ framework::Component render( std::pair<T, U> const& pair, const std::string& del
 
 
 
-template <typename Function, typename... Components >
-framework::Component stack( Function fn, Components... c ) {
+template <typename... Components >
+framework::Component stack( Components... c ) {
     return framework::StackLayout<> {
-        fn( c )...,
+        render( c )...,
     };
 }
 
-template <typename Function, typename... Components >
-framework::Component flow( Function fn, Components... c ) {
+template <typename... Components >
+framework::Component flow( Components... c ) {
     return framework::FlowLayout<> {
-        fn( c )...,
+        render( c )...,
     };
 }
 
