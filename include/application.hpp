@@ -1,14 +1,10 @@
 #ifndef __ALLCOATE_APPLICATION_HPP__
 #define __ALLCOATE_APPLICATION_HPP__
 
-#include <terminal/terminal.hpp>
-
-#include <allocate/dispatcher.hpp>
 #include <allocate/store.hpp>
 #include <allocate/model.hpp>
-
-#include <SQLiteCpp/Database.h>
-
+#include <terminal/terminal.hpp>
+#include <foundation/dispatcher.hpp>
 
 class Application
 {
@@ -16,10 +12,10 @@ private:
   using CallbackSignature = void (const std::vector<std::string >& );
 
 private:
-  framework::terminal terminal;
-  CommandDispatcher<std::string, CallbackSignature > dispatcher;
-  data::Store<data::Model > store;
-  bool quit;
+  framework::terminal terminal_;
+  framework::CommandDispatcher<std::string, CallbackSignature > dispatcher_;
+  data::Store<data::Model > store_;
+  bool quit_;
 
   public:
     Application();

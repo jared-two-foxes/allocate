@@ -1,7 +1,7 @@
 #ifndef __STORE_HPP__
 #define __STORE_HPP__
 
-#include <foundation/logger.hpp>
+#include <foundation/logger/logger.hpp>
 #include <functional>
 #include <vector>
 

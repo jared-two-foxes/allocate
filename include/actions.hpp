@@ -2,7 +2,6 @@
 #define ALLOCATE_ACTIONS_HPP__
 
 #include <allocate/model.hpp>
-#include <foundation/logger.hpp>
 #include <string>
 #include <vector>
 

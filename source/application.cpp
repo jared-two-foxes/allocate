@@ -5,7 +5,7 @@
 #include <allocate/widgets.hpp>
 
 #include <terminal/components/component.hpp>
-#include <foundation/logger.hpp>
+#include <foundation/logger/logger.hpp>
 #include <foundation/strings/utils.hpp>
 
 #include <assert.h>
@@ -13,8 +13,8 @@
 
 
 Application::Application() :
-  store({}),
-  quit(false)
+  store_({}),
+  quit_(false)
 {}
 
 Application::~Application()
@@ -24,8 +24,7 @@ void Application::setup()
 {
   initStoreListener();
   initDispatcher();
-
-  store.dispatch( actions::initState() );
+  store_.dispatch( actions::initState() );
 }
 
 void Application::renderSingleFrame( data::Model const& model )
@@ -42,12 +41,12 @@ void Application::renderSingleFrame( data::Model const& model )
   std::string const prompt( ">> " );
 
   // Show the current state.
-  terminal = terminal.flip( next + prompt );
+  terminal_ = terminal_.flip( next + prompt );
 }
 
 void Application::processCmd( std::string& cmd, std::vector<std::string >& args )
 {
-  dispatcher.process( cmd, args );
+  dispatcher_.process( cmd, args );
 }
 
 void Application::run()
@@ -57,12 +56,12 @@ void Application::run()
   std::string line;
   std::vector<std::string > args;
 
-  while (!quit)
+  while (!quit_)
   {
     // Grab the next operation from the command line.
     getline( std::cin, line );
 
-    terminal = terminal.append( line + '\n' );
+    terminal_ = terminal_.append( line + '\n' );
 
     // Pre-process command, split commands and arguments, and send to the
     // command processor.
@@ -75,24 +74,24 @@ void Application::initDispatcher()
 {
   // Lifecycle functions.
   auto quit_fn = [this](const std::vector<std::string >& args) {
-      Log( 0, "Quiting..." );
-      quit = true;
+    Log( 0, "Quiting..." );
+    quit_ = true;
   };
 
   // Account Functions.
   auto insert_account_fn = [this](const std::vector<std::string >& args ) {
     assert( args.size() >= 3 );
-    store.dispatch( actions::addAccount( args[1], args[2] ) );
+    store_.dispatch( actions::addAccount( args[1], args[2] ) );
   };
 
   auto update_account_fn = [this](const std::vector<std::string >& args ) {
     assert( args.size() >= 3 );
-    store.dispatch( actions::updateAccount( args[1], args[2] ) );
+    store_.dispatch( actions::updateAccount( args[1], args[2] ) );
   };
 
   // Create the actual dispatcher
-  dispatcher =
-      CommandDispatcher<std::string,
+  dispatcher_ =
+      framework::CommandDispatcher<std::string,
           void (std::vector<std::string > const& ) > {{
               {"quit", quit_fn},
               {"addAccount", insert_account_fn},
@@ -106,12 +105,12 @@ void Application::initStoreListener()
   {
     Application* app;
     virtual void onStateChanged() {
-      data::Model state = app->store.getState();
+      data::Model state = app->store_.getState();
       app->renderSingleFrame(state);
     }
   };
 
   static Listener listener;
   listener.app = this;
-  store.addListener( &listener );
+  store_.addListener( &listener );
 }

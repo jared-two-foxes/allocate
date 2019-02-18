@@ -1,11 +1,9 @@
 
-#include <foundation/logger.hpp>
-
 #include <allocate/application.hpp>
+#include <foundation/logger/logger.hpp>
 
 #include <vector>
 #include <fstream>
-
 
 int main( int argc, char* argv[] )
 {
